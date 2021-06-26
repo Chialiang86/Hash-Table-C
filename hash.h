@@ -40,6 +40,7 @@ map_t *map_init(int bits) {
     })
 
 #define GOLDEN_RATIO_32 0x61C88647 //1640531526.5
+// #define GOLDEN_RATIO_32 0x343F3434 //1640531526.5
 // #define GOLDEN_RATIO_32 0x9E3779BA //2654435769.5
 static inline unsigned int hash(unsigned int val, unsigned int bits) {
     /* High bits are more random, so use them. */
