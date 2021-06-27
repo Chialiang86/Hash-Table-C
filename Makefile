@@ -29,16 +29,14 @@ FIGDIR = .fig/
 
 PDIST = plot_distribution.gp
 PHASH = plot_hash.gp 
-PSCAL = plot_hash.gp 
 PSPEED = plot_speed.gp
+PSCAL = plot_scalability.gp 
 
 plot: $(GENERATE)
 	./$(GENERATE) 10 256 20
 	$(GP) $(PDIST)
 	$(GP) $(PHASH)
 	$(GP) $(PSCAL)
-
-psca:
 
 clean:
 	rm *.o $(MAIN) $(SPEED) $(GENERATE)

@@ -40,15 +40,17 @@ map_t *map_init(int bits) {
     })
 
 #define GOLDEN_RATIO_32 0x61C88647 //1640531526.5
-// #define GOLDEN_RATIO_32 0x343F3434 //1640531526.5
-// #define GOLDEN_RATIO_32 0x9E3779BA //2654435769.5
-static inline unsigned int hash(unsigned int val, unsigned int bits) {
+static inline unsigned int hash(unsigned int val, unsigned int bits, int lowbit) {
     /* High bits are more random, so use them. */
-    return (val * GOLDEN_RATIO_32) >> (32 - bits);
+    unsigned int ret = (val * GOLDEN_RATIO_32);
+    ret = ret << (32 - bits - lowbit);
+    ret = ret >> (32 - bits);
+
+    return ret;
 }
 
 static struct hash_key *find_key(map_t *map, int key) {
-    struct hlist_head *head = &(map->ht)[hash(key, map->bits)];
+    struct hlist_head *head = &(map->ht)[hash(key, map->bits, 0)]; //change
     for (struct hlist_node *p = head->first; p; p = p->next) {
         struct hash_key *kn = container_of(p, struct hash_key, node);
         if (kn->key == key)
@@ -63,7 +65,7 @@ void *map_get(map_t *map, int key)
     return kn ? kn->data : NULL;
 }
 
-void map_add(map_t *map, int key, void *data)
+void map_add(map_t *map, int key, void *data, int lowbit)
 {
     struct hash_key *kn = find_key(map, key);
     if (kn)
@@ -72,8 +74,8 @@ void map_add(map_t *map, int key, void *data)
     kn = (struct hash_key*)malloc(sizeof(struct hash_key));
     kn->key = key, kn->data = data;
 
-    map->ht[hash(key, map->bits)].cnt += 1;
-    struct hlist_head *h = &map->ht[hash(key, map->bits)];
+    map->ht[hash(key, map->bits, lowbit)].cnt += 1;
+    struct hlist_head *h = &map->ht[hash(key, map->bits, lowbit)];
     struct hlist_node *n = &kn->node, *first = h->first;
     n->next = first;
     if (first)
@@ -94,17 +96,17 @@ void map_deinit(map_t *map)
             struct hlist_node *n = p;
             p = p->next;
 
-            if (!n->pprev) /* unhashed */
-                goto bail;
-
+            // modify
+            
             struct hlist_node *next = n->next, **pprev = n->pprev;
             *pprev = next;
             if (next)
                 next->pprev = pprev;
             n->next = NULL, n->pprev = NULL;
 
-        bail:
-            free(kn->data);
+            // modify
+            if (kn->data)
+                free(kn->data);
             free(kn);
         }
     }

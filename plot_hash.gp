@@ -5,6 +5,6 @@ set style fill solid
 set grid
 set title 'hash result'
 set term png enhanced font 'Verdana,10'
-set output 'fig/hash_1024_original.png'
+set output 'fig/hash.png'
 
-plot [:2200][:2200] 'dat/generate.dat' with points title 'hash'
+plot [:1100][:1100] 'dat/generate_1024.dat' with points title 'hash'
