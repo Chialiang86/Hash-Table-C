@@ -7,21 +7,18 @@ GENERATE = generate
 SPEED = speed
 
 all: $(NLP) $(SPEED) $(GENERATE)
-nlp: $(NLP)
-speed: $(SPEED)
-generate: $(GENERATE)
 
 %.o: %.c
 	$(CC) -c $^
 
-$(NLP): nlp_v.o
-	$(CC) -o $@ $<
+nlp: nlp_v.o
+	$(CC) -o $(NLP) $<
 
-$(SPEED): speed.o
-	$(CC) -o $@ $<
+speed: speed.o
+	$(CC) -o $(SPEED) $<
 
-$(GENERATE): generate.o
-	$(CC) -o $@ $<
+generate: generate.o
+	$(CC) -o $(GENERATE) $<
 
 # for data digure
 DATDIR = .dat/
