@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "tuple": "cpp",
+        "chrono": "cpp",
+        "__tree": "cpp",
+        "map": "cpp",
+        "__hash_table": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "hash.h": "c",
+        "algorithm": "c",
+        "limits": "c",
+        "random": "c",
+        "ratio": "c"
+    }
+}

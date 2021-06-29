@@ -5,6 +5,6 @@ set style fill solid
 set grid
 set title 'distribution'
 set term png enhanced font 'Verdana,10'
-set output 'fig/distribution.png'
+set output 'fig/nlp_distribution.png'
 
-plot [0:1024][0:5] 'dat/distribution_1024.dat' using 1 with histogram title 'key count'
+plot [0:1024][0:5] 'dataset/distribution.dat' using 1 with histogram title 'key count'

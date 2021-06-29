@@ -2,19 +2,19 @@ CC = gcc
 GP = gnuplot
 
 # for c code and execution files
-MAIN = main
+NLP = nlp_v
 GENERATE = generate
 SPEED = speed
 
-all: $(MAIN) $(SPEED) $(GENERATE)
-main: $(MAIN)
+all: $(NLP) $(SPEED) $(GENERATE)
+nlp: $(NLP)
 speed: $(SPEED)
 generate: $(GENERATE)
 
 %.o: %.c
 	$(CC) -c $^
 
-$(MAIN): main.o
+$(NLP): nlp_v.o
 	$(CC) -o $@ $<
 
 $(SPEED): speed.o
@@ -34,9 +34,8 @@ PSCAL = plot_scalability.gp
 
 plot: $(GENERATE)
 	./$(GENERATE) 10 256 20
-	$(GP) $(PDIST)
 	$(GP) $(PHASH)
 	$(GP) $(PSCAL)
 
 clean:
-	rm *.o $(MAIN) $(SPEED) $(GENERATE)
+	rm *.o $(NLP) $(SPEED) $(GENERATE)

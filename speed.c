@@ -1,7 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "hash.h"
+#include "hashtable.h"
 
 #define NINO 1000000000
 
