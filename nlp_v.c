@@ -8,7 +8,7 @@ int main(int argc, char * argv []) {
     FILE *fin, *fout;
     if (!(fin = fopen("dataset/spam.csv", "r")) || !(fout = fopen("dataset/distribution.dat", "w"))) {
         printf("dataset load failed.\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 
     char line[256];
@@ -19,7 +19,7 @@ int main(int argc, char * argv []) {
     map_t *hmap = map_init(bits, 's'); // 49063 / 65536 ~= 0.76
     if (!hmap) {
         printf("hash map malloc error!\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 
     srand(time(NULL));

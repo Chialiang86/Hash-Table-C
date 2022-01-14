@@ -37,8 +37,8 @@ static inline unsigned int shash(const char *str, unsigned int bits) {
     if (!str)
         return 0;
 
-    unsigned int ret = 1;
-    for (int i = 0; i < strlen(str); i++) 
+    unsigned int ret = 1, len = strlen(str);
+    for (int i = 0; i < len; i++) 
         ret = (ret * str[i] * GOLDEN_RATIO_32) >> (32 - bits);
 
     return ret;
