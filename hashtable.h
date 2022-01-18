@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include "hash.h"
@@ -34,6 +35,8 @@
         ((type *) (__mptr - offsetof(type, member))); \
     })
 
+
+
 struct hmap_info {
     int key_cnt;
     float load_factor;
@@ -62,7 +65,7 @@ map_t *map_init(int bits, char type) {
     return map;
 }
 
-static struct hash_key *find_key(map_t *map, int key) {
+static struct hash_key *find_ikey(map_t *map, int key) {
     assert(TYPE_CONSISTENT(map, 'i'));
     struct hlist_head *head = &(map->ht)[hash(key, map->bits)]; //change
     for (struct hlist_node *p = head->first; p; p = p->next) {
@@ -75,7 +78,7 @@ static struct hash_key *find_key(map_t *map, int key) {
 
 static struct hash_skey *find_skey(map_t *map, char * skey) {
     assert(TYPE_CONSISTENT(map, 's'));
-    struct hlist_head *head = &(map->ht)[shash(skey, map->bits)]; //change
+    struct hlist_head *head = &(map->ht)[hash(skey, map->bits)]; //change
     for (struct hlist_node *p = head->first; p; p = p->next) {
         struct hash_skey *kn = container_of(p, struct hash_skey, node);
         if (strcmp(kn->skey, skey) == 0)
@@ -84,7 +87,14 @@ static struct hash_skey *find_skey(map_t *map, char * skey) {
     return NULL;
 }
 
-void *map_get(map_t *map, int key)
+#define find_key(map, key)  \
+    _Generic((key), \
+        int: find_ikey, \
+        char*: find_skey\
+    )(map, key)\
+
+
+void *map_geti(map_t *map, int key)
 {
     assert(TYPE_CONSISTENT(map, 'i'));
 
@@ -96,11 +106,18 @@ void *map_gets(map_t *map, char * skey)
 {
     assert(TYPE_CONSISTENT(map, 's'));
 
-    struct hash_skey *kn = find_skey(map, skey);
+    struct hash_skey *kn = find_key(map, skey);
     return kn ? kn->data : NULL;
 }
 
-void map_add(map_t *map, int key, void *data)
+#define map_get(map, key) \
+    _Generic((key), \
+        int: map_geti, \
+        char*: map_gets\
+    )(map, key)\
+
+
+void map_addi(map_t *map, int key, void *data)
 {
     assert(TYPE_CONSISTENT(map, 'i'));
 
@@ -126,7 +143,7 @@ void map_add(map_t *map, int key, void *data)
 void map_adds(map_t *map, char *skey, void *data)
 {
     assert(TYPE_CONSISTENT(map, 's'));
-    struct hash_skey *kn = find_skey(map, skey);
+    struct hash_skey *kn = find_key(map, skey);
     if (kn)
         return;
 
@@ -139,7 +156,7 @@ void map_adds(map_t *map, char *skey, void *data)
         return;
 
     kn->skey = skey, kn->data = data;
-    struct hlist_head *h = &map->ht[shash(skey, map->bits)];
+    struct hlist_head *h = &map->ht[hash(skey, map->bits)];
     struct hlist_node *n = &kn->node, *first = h->first;
     n->next = first;
     
@@ -149,7 +166,14 @@ void map_adds(map_t *map, char *skey, void *data)
     n->pprev = &h->first;
 }
 
-void map_del(map_t *map, int key) {
+#define map_add(map, key, data)  \
+    _Generic((key), \
+        int: map_addi, \
+        char*: map_adds\
+    )(map, key, data)\
+
+
+void map_deli(map_t *map, int key) {
     assert(TYPE_CONSISTENT(map, 'i'));
     struct hash_key *kn = find_key(map, key);
     if (!kn)
@@ -169,7 +193,7 @@ void map_del(map_t *map, int key) {
 
 void map_dels(map_t *map, char *skey) {
     assert(TYPE_CONSISTENT(map, 's'));
-    struct hash_skey *kn = find_skey(map, skey);
+    struct hash_skey *kn = find_key(map, skey);
     if (!kn)
         return;
     
@@ -184,6 +208,14 @@ void map_dels(map_t *map, char *skey) {
         free(kn->data);
     free(kn);
 }
+
+#define map_del(map, key)  \
+    _Generic((key), \
+        int: map_deli, \
+        char*: map_dels\
+    )(map, key)\
+
+
 
 void map_deinit(map_t *map)
 {
@@ -244,6 +276,10 @@ void map_deinits(map_t *map)
     }
     free(map);
 }
+
+
+
+
 
 /* 
  * show the information of :
@@ -326,3 +362,4 @@ struct hmap_info* map_get_info(map_t *map) {
 
     return ret;
 }
+

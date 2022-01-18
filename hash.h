@@ -29,7 +29,7 @@ struct hash_skey {
 #define GOLDEN_RATIO_32 0x61C88647 //1640531526.5
 #define GOLDEN_RATIO_64 0x61C8864680B583EBull
 
-static inline unsigned int hash(unsigned int val, unsigned int bits) {
+static inline unsigned int ihash(unsigned int val, unsigned int bits) {
     return (val * GOLDEN_RATIO_32) >> (32 - bits);
 }
 
@@ -43,3 +43,11 @@ static inline unsigned int shash(const char *str, unsigned int bits) {
 
     return ret;
 }
+
+#define hash(val, bits) \
+_Generic((val), \
+    unsigned int: ihash, \
+    int: ihash, \
+    const char *: shash, \
+    char *: shash \
+)(val, bits)

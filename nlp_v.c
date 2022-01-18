@@ -32,7 +32,7 @@ int main(int argc, char * argv []) {
             for (int si = 0; si < s_size; si++)
                 s[si] = (char)(rand() % 92 + 33); 
             s[s_size] = '\0';
-            printf("key : %s, value = %d\n", s, shash(s, bits));
+            printf("key : %s, value = %d\n", s, hash(s, bits));
             map_adds(hmap, s, NULL);
             free(s);
         }
