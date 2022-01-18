@@ -34,5 +34,8 @@ plot: $(GENERATE)
 	$(GP) $(PHASH)
 	$(GP) $(PSCAL)
 
+format:
+	clang-format -i *.[ch]
+
 clean:
 	rm *.o $(NLP) $(SPEED) $(GENERATE)
