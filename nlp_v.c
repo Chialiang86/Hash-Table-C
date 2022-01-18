@@ -56,7 +56,7 @@ int main(int argc, char * argv []) {
         unsigned int cnt = 0;
         HLIST_FOR_EACH(tmp, head)
             cnt++;
-        fprintf(fout, "%i\n", cnt);
+        fprintf(fout, "%x\n", cnt);
     }
 
     map_log_info(hmap);

@@ -29,10 +29,10 @@
 #define TYPE_CONSISTENT(map, t) \
     (map && map->type == t) ? 1 : 0
 
-#define container_of(ptr, type, member)               \
-    ({                                                \
-        void *__mptr = (void *) (ptr);                \
-        ((type *) (__mptr - offsetof(type, member))); \
+#define container_of(ptr, type, member)                            \
+    __extension__({                                                \
+        const __typeof__(((type *) 0)->member) *__pmember = (ptr); \
+        (type *) ((char *) __pmember - offsetof(type, member));    \
     })
 
 
@@ -69,7 +69,7 @@ static struct hash_key *find_ikey(map_t *map, int key) {
     assert(TYPE_CONSISTENT(map, 'i'));
     struct hlist_head *head = &(map->ht)[hash(key, map->bits)]; //change
     for (struct hlist_node *p = head->first; p; p = p->next) {
-        struct hash_key *kn = container_of(p, struct hash_key, node);
+        struct hash_key *kn = (struct hash_key *)container_of(p, struct hash_key, node);
         if (kn->key == key)
             return kn;
     }
@@ -126,7 +126,7 @@ void map_addi(map_t *map, int key, void *data)
         return;
 
     kn = (struct hash_key*)malloc(sizeof(struct hash_key));
-    if (!kn) // add
+    if (!kn)
         return; 
 
     kn->key = key, kn->data = data;
@@ -150,12 +150,17 @@ void map_adds(map_t *map, char *skey, void *data)
     kn = (struct hash_skey*)malloc(sizeof(struct hash_skey));
     if (!kn) // add
         return;
-
-    kn->skey = (char *)malloc(sizeof(char) * strlen(skey));
-    if (!kn->skey) // add
+    
+    size_t len = strlen(skey) + 1;
+    kn->skey = (char *)malloc(sizeof(char) * len);
+    if (!kn->skey) {
+        free(kn);
         return;
+    }
 
-    kn->skey = skey, kn->data = data;
+    strncpy(kn->skey, skey, len);
+    kn->skey[len-1] = '\0';
+    kn->data = data;
     struct hlist_head *h = &map->ht[hash(skey, map->bits)];
     struct hlist_node *n = &kn->node, *first = h->first;
     n->next = first;
