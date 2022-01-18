@@ -1,0 +1,8 @@
+*.o
+# fig/hash.png
+# fig/scalability.png
+data/*.dat
+fig/*.png
+generate
+nlp_v
+speed

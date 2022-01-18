@@ -3,12 +3,13 @@
 #include <time.h>
 #include "hashtable.h"
 
-int main(int argc, char * argv []) {
-
+int main(int argc, char *argv[])
+{
     FILE *fin, *fout;
-    if (!(fin = fopen("dataset/spam.csv", "r")) || !(fout = fopen("dataset/distribution.dat", "w"))) {
+    if (!(fin = fopen("dataset/spam.csv", "r")) ||
+        !(fout = fopen("dataset/distribution.dat", "w"))) {
         printf("dataset load failed.\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 
     char line[256];
@@ -16,10 +17,10 @@ int main(int argc, char * argv []) {
     char msg[248];
     int bits = 16;
 
-    map_t *hmap = map_init(bits, 's'); // 49063 / 65536 ~= 0.76
+    map_t *hmap = map_init(bits, 's');  // 49063 / 65536 ~= 0.76
     if (!hmap) {
         printf("hash map malloc error!\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 
     srand(time(NULL));
@@ -27,17 +28,17 @@ int main(int argc, char * argv []) {
 
     for (int i = 0; i < max_i; i++) {
         int s_size = 3 + rand() % 27;
-        char *s = (char *)malloc(sizeof(char) * (s_size + 1));
+        char *s = (char *) malloc(sizeof(char) * (s_size + 1));
         if (s) {
             for (int si = 0; si < s_size; si++)
-                s[si] = (char)(rand() % 92 + 33); 
+                s[si] = (char) (rand() % 92 + 33);
             s[s_size] = '\0';
-            printf("key : %s, value = %d\n", s, shash(s, bits));
+            printf("key : %s, value = %d\n", s, hash(s, bits));
             map_adds(hmap, s, NULL);
             free(s);
         }
     }
- 
+
     // while (fgets(line, sizeof(line), fin) != NULL) {
 
     //     sscanf(line, "%[^,], %[^\n]", type, msg);
@@ -52,11 +53,12 @@ int main(int argc, char * argv []) {
     //     }
     // }
 
-    HMAP_FOR_EACH(head, hmap, i) {
+    HMAP_FOR_EACH(head, hmap, i)
+    {
         unsigned int cnt = 0;
         HLIST_FOR_EACH(tmp, head)
-            cnt++;
-        fprintf(fout, "%i\n", cnt);
+        cnt++;
+        fprintf(fout, "%x\n", cnt);
     }
 
     map_log_info(hmap);
